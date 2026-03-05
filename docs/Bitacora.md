@@ -1,6 +1,6 @@
 # Bitácora Experimento - Observabilidad y Monitoreo
 
-**Nombre del estudiante:** _____________________________  
+**Karol Estupiñan** _____________________________  
 ---
 
 Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.office.com/r/US1LARPmec)⭐
@@ -22,12 +22,13 @@ Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.o
 
 **¿La aplicación se desplegó correctamente?** 
 
-- [ ] Sí
+- [X] Sí
 - [ ] No
 
 **Captura de pantalla de la aplicación funcionando:**
 
-> _[Inserta aquí la imagen de la aplicación corriendo en /api/]_
+DNS: http://ec2-34-229-215-195.compute-1.amazonaws.com/
+> _[Inserta aquí la imagen de la aplicación corriendo en /api/![img.png](img.png)]_
 
 ### 1.3. Observaciones y problemas encontrados (opcional)
 ```
@@ -44,44 +45,44 @@ Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.o
 
 **Endpoints probados:**
 
-- [ ] `GET /api/`
-- [ ] `POST /api/shorten`
-- [ ] `GET /api/{shortCode}`
-- [ ] `GET /api/urls`
+- [X] `GET /api/`
+- [X] `POST /api/shorten`
+- [X] `GET /api/{shortCode}`
+- [X] `GET /api/urls`
 
 
 ### 2.0.2. Análisis de dos métricas relevantes
 
-#### Métrica 1
+####  http_server_requests_active_seconds_max
 
-**Nombre de la métrica:**  
+**Gauge:**  
 ```
 
 ```
 
 **Tipo de métrica:** 
 - [ ] Counter
-- [ ] Gauge 
+- [X] Gauge 
 - [ ] Histogram 
 - [ ] Summary
 
 **Descripción de qué información aporta:**
 ```
-
+El tiempo maximo en la que la peticion duro en un periodo de tiempo
 
 
 ```
 
 **Relación con otras métricas (si aplica):**
 ```
-Ejemplo: Un aumento en peticiones HTTP podría influir en el uso de CPU
-
+Se relaciona con:
+    http_server_request_seconds_count 
 
 ```
 
 **¿En que escenarios puede ayudar esta métrica?**
 ```
-
+Para detectar enpoints lentos
 
 
 ```
@@ -90,7 +91,9 @@ Ejemplo: Un aumento en peticiones HTTP podría influir en el uso de CPU
 ```
 Ejemplo: uri, method, status, instance, job, etc.
 
-
+url
+method
+status
 
 ```
 
@@ -98,7 +101,7 @@ Ejemplo: uri, method, status, instance, job, etc.
 
 #### Métrica 2
 
-**Nombre de la métrica:**  
+**jvm_gc_pause_second:**  
 ```
 
 ```
@@ -107,25 +110,23 @@ Ejemplo: uri, method, status, instance, job, etc.
 - [ ] Counter
 - [ ] Gauge 
 - [ ] Histogram 
-- [ ] Summary
+- [X] Summary
 
 **Descripción de qué información aporta:**
 ```
-
+los segundos que tarda en gc
 
 
 ```
 
 **Relación con otras métricas (si aplica):**
 ```
-Ejemplo: Un aumento en peticiones HTTP podría influir en el uso de CPU
-
 
 ```
 
 **¿En que escenarios puede ayudar esta métrica?**
 ```
-
+Pra poder resolver un problema de memory limit
 
 
 ```
@@ -134,7 +135,7 @@ Ejemplo: Un aumento en peticiones HTTP podría influir en el uso de CPU
 ```
 Ejemplo: uri, method, status, instance, job, etc.
 
-
+action,cause
 
 ```
 
@@ -147,7 +148,7 @@ Ejemplo: uri, method, status, instance, job, etc.
 
 **Captura de pantalla del dashboard:**
 
-> _[Inserta aquí la imagen del dashboard con los 4 paneles]_
+> _[Inserta aquí la imagen del dashboard con los 4 paneles]_![img_1.png](img_1.png)
 
 ### 2.1.2. Visualizaciónes Adicionales (Con las metricas actuales)
 
@@ -157,24 +158,24 @@ Ejemplo: uri, method, status, instance, job, etc.
 ```
 ¿Qué quieres analizar o mostrar? Menciona qué métrica(s) vas a usar
 
+Identificar cuáles endpoints reciben más tráfico
 
 ```
 
 **Título del panel:**
 ```
-
+Top 5 endpoints más utilizados
 ```
 
 **Consulta (PromQL o LogQL):**
 ```
-Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la consulta que se muestra en la caja de texto de la seccion Code.
-
+topk(5, sum by(uri) (rate(http_server_requests_seconds_count[1m])))
 ```
 
 **Tipo de visualización:** 
 - [ ] Time series
 - [ ] Gauge
-- [ ] Bar chart
+- [X] Bar chart
 - [ ] Stat
 - [ ] Logs
 - [ ] Otro: _____
@@ -188,12 +189,12 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 **Captura de pantalla:**
 
 > _[Inserta aquí la imagen del panel]_
-
+![img_3.png](img_3.png)
 **Análisis (2-3 frases):**
 ```
 ¿Qué conclusiones o patrones observas?
 
-
+Api/shorten y api/{shortCode} se usan casi la misma cantidad de veces
 
 ```
 
@@ -203,27 +204,25 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **Propósito:**
 ```
-¿Qué quieres analizar o mostrar? Menciona qué métrica(s) vas a mostrar
-
-
+Mostrar la cantidad total acumulada de solicitudes que ha procesado la aplicación, permitiendo entender el volumen general de tráfico recibido.
 ```
 
 **Título del panel:**
 ```
-
+Total de solicitudes procesadas
 ```
 
 **Consulta (PromQL o LogQL):**
 ```
 Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la consulta que se muestra en la caja de texto de la seccion Code.
-
+sum(http_server_requests_seconds_count)
 ```
 
 **Tipo de visualización:** 
 - [ ] Time series
 - [ ] Gauge
 - [ ] Bar chart
-- [ ] Stat
+- [X] Stat
 - [ ] Logs
 - [ ] Otro: _____
 
@@ -235,13 +234,13 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **Captura de pantalla:**
 
-> _[Inserta aquí la imagen del panel]_
+> ![img_4.png](img_4.png)_[Inserta aquí la imagen del panel]_
 
 **Análisis (2-3 frases):**
 ```
 ¿Qué conclusiones o patrones observas?
 
-
+Permite tener una visión general del volumen de uso del sistema y puede ser útil para comparar diferentes periodos de actividad o cargas de trabajo.
 
 ```
 
@@ -252,7 +251,7 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 **¿Qué otros datos te gustaría visualizar si tuvieras más información disponible?**
 ```
 
-
+Por lo momento no se me ocurre..
 
 ```
 
@@ -265,24 +264,38 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **1. Nombre de la métrica:**
 ```
-Ejemplo: url_shortener_urls_created_total
+url_shortener_shorten_duration
 
 ```
 
 **2. Tipo de métrica:**
 - [ ] Counter
 - [ ] Gauge
+- [x] Timer
 
 **3. ¿Qué comportamiento mide?**
 ```
-
-
+El tiempo que tarda el servicio en generar una URL corta desde que inicia el método shortenUrl hasta que finaliza.
 
 ```
 
 **4. ¿Por qué es relevante para el sistema?**
 ```
+Permite detectar:
 
+degradación del rendimiento
+
+aumentos de latencia
+
+problemas en la generación de códigos o almacenamiento
+
+Si el tiempo aumenta, podría indicar:
+
+saturación
+
+problemas de memoria
+
+crecimiento del almacenamiento en memoria
 
 
 ```
@@ -301,7 +314,7 @@ Ejemplo: url_shortener_urls_created_total
 - [ ] Otro: _____
 
 **2. ¿Qué consulta PromQL vas a utilizar?**
-```promql
+```
 
 
 

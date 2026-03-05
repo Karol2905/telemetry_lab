@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import io.micrometer.core.instrument.Timer;
 
 @Service
 public class UrlShortenerService {
@@ -23,11 +24,17 @@ public class UrlShortenerService {
     private final Random random = new Random();
 
     private final Counter dummyCounter;
+    private final Timer shortenUrlTimer;
 
     public UrlShortenerService(MeterRegistry meterRegistry) {
         logger.info("UrlShortenerService initialized with in-memory storage");
+
         this.dummyCounter = Counter.builder("dummyCounter")
                 .description("dummy description")
+                .register(meterRegistry);
+
+        this.shortenUrlTimer = Timer.builder("url_shortener_shorten_duration")
+                .description("Time taken to shorten a URL")
                 .register(meterRegistry);
     }
 
@@ -45,23 +52,28 @@ public class UrlShortenerService {
      * Acorta una URL y retorna el código corto
      */
     public UrlMapping shortenUrl(String originalUrl, String customCode) {
-        simulateLatency();
-        String shortCode;
-        if (customCode != null && !customCode.isEmpty()) {
-            if (urlStorage.containsKey(customCode)) {
-                logger.warn("Custom code already exists: {}", customCode);
-                throw new IllegalArgumentException("Custom code already exists: " + customCode);
+
+        return shortenUrlTimer.record(() -> {
+
+            simulateLatency();
+
+            String shortCode;
+            if (customCode != null && !customCode.isEmpty()) {
+                if (urlStorage.containsKey(customCode)) {
+                    logger.warn("Custom code already exists: {}", customCode);
+                    throw new IllegalArgumentException("Custom code already exists: " + customCode);
+                }
+                shortCode = customCode;
+            } else {
+                shortCode = generateShortCode();
             }
-            shortCode = customCode;
-        } else {
-            shortCode = generateShortCode();
-        }
 
-        UrlMapping mapping = new UrlMapping(shortCode, originalUrl);
-        urlStorage.put(shortCode, mapping);
+            UrlMapping mapping = new UrlMapping(shortCode, originalUrl);
+            urlStorage.put(shortCode, mapping);
 
-        logger.info("URL shortened - Code: {}, Original URL: {}", shortCode, originalUrl);
-        return mapping;
+            logger.info("URL shortened - Code: {}, Original URL: {}", shortCode, originalUrl);
+            return mapping;
+        });
     }
 
     /**
